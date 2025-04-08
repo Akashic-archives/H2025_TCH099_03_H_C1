@@ -70,3 +70,6 @@ body {
     border: none;
     cursor: pointer;
 }
+.highlight{
+    background-color: rgb(30, 255, 0);
+}
