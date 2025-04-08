@@ -388,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 movePiece(clickedSquare);
                 if(whiteStart==true){
                     startClock();
+                    whiteStart=false;
                 }
             } else {
                 clearHighlights();
