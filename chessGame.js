@@ -324,11 +324,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!selectedPiece || !selectedSquare){ 
             return;
         }
-        // if (!targetSquare.classList.contains("highlight")){
-        //     return;
-        // }
 
         if (targetSquare.hasChildNodes()) {
+
             let targetPiece = targetSquare.firstElementChild;
             let targetPieceColor = targetPiece.classList.contains("WhitePieces") ? "white" : "black";
             let currentPieceColor = selectedPiece.classList.contains("WhitePieces") ? "white" : "black";
@@ -372,53 +370,46 @@ document.addEventListener("DOMContentLoaded", () => {
         clearHighlights();
         selectedPiece = null;
         selectedSquare = null;
+        
+        //Start the clock of the game when white does first move
+        if(whiteStart==true){
+            startClock();
+            whiteStart=false;
+        }
+
         switchPlayer();
     }
 
 
     for (let i = 0; i < boardSquares.length; i++) {
         boardSquares[i].addEventListener("click", (event) => {
-            let clickedSquare = event.currentTarget;
-            
-            if (clickedSquare.hasChildNodes()) {
 
-                // Deselect if clicked again
+            let clickedSquare = event.currentTarget;
+            if (clickedSquare.hasChildNodes()) {
                 if (clickedSquare === selectedSquare) {
                     clearHighlights();
                     selectedPiece = null;
                     selectedSquare = null;
                     return;
                 }
-                if(!draggingPiece){
-                if(clickedSquare.firstElementChild.classList.contains("BlackPieces")&&currentPlayer==1){
+        
+                const piece = clickedSquare.firstElementChild;
+                const pieceColor = piece.classList.contains("WhitePieces") ? 2 : 1;
+        
+                if (pieceColor === currentPlayer) {
                     showLegalMoves(clickedSquare);
-                }
-                if(clickedSquare.firstElementChild.classList.contains("WhitePieces")&&currentPlayer==2){
-                    showLegalMoves(clickedSquare);
-                }
-                if(clickedSquare.firstElementChild.classList.contains("WhitePieces")&&currentPlayer==1&&clickedSquare.classList.contains("highlight")){
+                } else if (clickedSquare.classList.contains("highlight")) {
                     movePiece(clickedSquare);
                 }
-                if(clickedSquare.firstElementChild.classList.contains("BlackPieces")&&currentPlayer==2&&clickedSquare.classList.contains("highlight")){
-                    movePiece(clickedSquare);
-                }
-                }
-            }
-            else if (clickedSquare.classList.contains("highlight")) {
+
+            } else if (clickedSquare.classList.contains("highlight")) {
                 movePiece(clickedSquare);
-                if(whiteStart==true){
-                    startClock();
-                    whiteStart=false;
-                }
             } else {
                 clearHighlights();
             }
+
         });
-    }
 
-    //Dragging to move pieces
-
-    for (let i = 0; i < boardSquares.length; i++) {
         boardSquares[i].addEventListener("mousedown", (e) => {
             let square = e.currentTarget;
 
@@ -429,6 +420,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (pieceColor === currentPlayer) {
                 draggingPiece = piece;
                 originSquare = square;
+                selectedPiece = piece;
+                selectedSquare = square;
                 showLegalMoves(square);
 
                 //Clone the piece and make it follow the mouse
@@ -447,25 +440,49 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
    
-
     boardSquares[i].addEventListener("mouseup", (e) => {
         let square = e.currentTarget;
-        if (draggingPiece && square.classList.contains("highlight")) {
+        
+        if(draggingPiece){
             
+        if (square.classList.contains("highlight")) {
+            console.log("yes");
             movePiece(square);
 
         //if dragging a piece and an originSquare exists readd the piece to board
-        } else if (draggingPiece && originSquare) {
+        } else{
             originSquare.appendChild(draggingPiece);
+            cleanupDrag();
+            
+    //old click code
+            let clickedSquare = square
+            
+            if (clickedSquare.hasChildNodes()) {
+
+                const piece = clickedSquare.firstElementChild;
+                const pieceColor = piece.classList.contains("WhitePieces") ? 2 : 1;
+        
+                if (pieceColor === currentPlayer) {
+                    showLegalMoves(clickedSquare);
+                } else if (clickedSquare.classList.contains("highlight")) {
+                    movePiece(clickedSquare);
+                }
+
+            } else if (clickedSquare.classList.contains("highlight")) {
+                movePiece(clickedSquare);
+            } else {
+                
+                clearHighlights();
+            }
+
         }
         cleanupDrag();
+    }
     });
-
-};
+}
 
 //Prevents bugs, removes dragged piece, reset variables
 function cleanupDrag() {
-    clearHighlights();
     if (ghostPiece) {
         ghostPiece.remove();
         ghostPiece = null;
@@ -511,7 +528,5 @@ document.addEventListener('dragstart', (e) => {
     //     clearInterval(interval);
     //     startClock();
     // }
-
-
 
 });
