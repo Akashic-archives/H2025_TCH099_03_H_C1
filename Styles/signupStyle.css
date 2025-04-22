@@ -30,12 +30,12 @@ header {
 
 
 
-#prenom, #nom, #courriel, #motDePasse, #confirmation{
+#prenom, #nom, #username, #courriel, #motDePasse, #confirmation{
     font-size: 15px;
     text-align: left;
 }
 
-#prenomBar, #nomBar, #courrielBar, #motDePasseBar, #confirmationBar{
+#prenomBar, #nomBar, #usernameBar,#courrielBar, #motDePasseBar, #confirmationBar{
     width: 200px;
     height: 35px;
     display: flex;
