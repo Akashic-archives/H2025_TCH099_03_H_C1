@@ -1,0 +1,75 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #2f4a3c;
+}
+
+
+.chess-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+    border: 5px solid black;
+}
+.chess-piece {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+.playerIcon{
+    max-width: 6%;
+    max-height: fit-content;
+    padding-left: 2%;
+    border: black;
+    border-width: 5px;
+}
+
+#player1-clock, #player2-clock {
+    text-align: center;
+    width: 100%;
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+.light {
+    background-color: #eee;
+}
+.dark {
+    background-color: #769656;
+}
+
+.top-bar, .bottom-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    color: white;
+}
+.call-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    margin-right: 10px;
+    font-style: italic;
+    border: none;
+    cursor: pointer;
+}
+.highlight{
+    background-color: rgb(30, 255, 0);
+}
