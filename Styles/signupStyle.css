@@ -2,12 +2,12 @@ body{
     margin: 0;
     background-image: url("/Assets/Chessboard.png");
     display: grid;
-    grid-template-rows: 15% 90% 25%;
+    grid-template-rows: 5rem auto 7rem;
 }
 
 
 main {
-    padding-top: 5%;
+    padding: 5%;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
     color: #b6eed1;
@@ -37,7 +37,7 @@ header {
 
 #prenomBar, #nomBar, #courrielBar, #motDePasseBar, #confirmationBar{
     width: 200px;
-    height: 25px;
+    height: 35px;
     display: flex;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     padding-left: 10px;
@@ -51,9 +51,10 @@ header {
 }
 
 #titreInscription {
-    font-size: 55px;
+    font-size: 45px;
     text-align: center;
     margin: 0;
+
 }
 
 #signupToLogin {
@@ -115,4 +116,12 @@ header {
 footer{
     bottom: 0;
     background-color: #1e3027;
+}
+
+#copyright {
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #9ccfb4;
 }
