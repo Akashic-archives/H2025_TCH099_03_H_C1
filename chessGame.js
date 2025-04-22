@@ -14,6 +14,11 @@
 // DONE Coloring squares
 
 
+//This game currently functions with highlighted Squares
+//I check if the move is valid through piece selections and if the ending square is highlighted
+//It should be highlighted if its a valid move of that piece type
+
+let gameHistory = [];
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,6 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
     //2 is white for now
     let currentPlayer = 2;
     let interval;
+
+    let draggingPiece = null;
+    let originSquare = null;
+    let ghostPiece = null;
+
 
     function updateClockDisplay() {
         player1Clock.textContent = formatTime(timePlayer1);
@@ -314,9 +324,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!selectedPiece || !selectedSquare){ 
             return;
         }
-        if (!targetSquare.classList.contains("highlight")){
-            return;
-        }
+        // if (!targetSquare.classList.contains("highlight")){
+        //     return;
+        // }
 
         if (targetSquare.hasChildNodes()) {
             let targetPiece = targetSquare.firstElementChild;
@@ -371,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let clickedSquare = event.currentTarget;
             
             if (clickedSquare.hasChildNodes()) {
-                
+
                 // Deselect if clicked again
                 if (clickedSquare === selectedSquare) {
                     clearHighlights();
@@ -379,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     selectedSquare = null;
                     return;
                 }
-                
+                if(!draggingPiece){
                 if(clickedSquare.firstElementChild.classList.contains("BlackPieces")&&currentPlayer==1){
                     showLegalMoves(clickedSquare);
                 }
@@ -391,6 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 if(clickedSquare.firstElementChild.classList.contains("BlackPieces")&&currentPlayer==2&&clickedSquare.classList.contains("highlight")){
                     movePiece(clickedSquare);
+                }
                 }
             }
             else if (clickedSquare.classList.contains("highlight")) {
@@ -404,6 +415,84 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    //Dragging to move pieces
+
+    for (let i = 0; i < boardSquares.length; i++) {
+        boardSquares[i].addEventListener("mousedown", (e) => {
+            let square = e.currentTarget;
+
+        if (square.hasChildNodes()) {
+
+            const piece = square.firstElementChild;
+            const pieceColor = piece.classList.contains("WhitePieces") ? 2 : 1;
+            if (pieceColor === currentPlayer) {
+                draggingPiece = piece;
+                originSquare = square;
+                showLegalMoves(square);
+
+                //Clone the piece and make it follow the mouse
+                ghostPiece = piece.cloneNode(true);
+                ghostPiece.style.position = "absolute";
+                ghostPiece.style.pointerEvents = "none";
+                ghostPiece.style.zIndex = "1000";
+                ghostPiece.style.width = piece.offsetWidth + "px";
+                ghostPiece.style.height = piece.offsetHeight + "px";
+
+                document.body.appendChild(ghostPiece);
+                //remove piece getting dragged
+                square.removeChild(piece);
+                moveGhostPiece(e);
+            }
+        }
+    });
+   
+
+    boardSquares[i].addEventListener("mouseup", (e) => {
+        let square = e.currentTarget;
+        if (draggingPiece && square.classList.contains("highlight")) {
+            
+            movePiece(square);
+
+        //if dragging a piece and an originSquare exists readd the piece to board
+        } else if (draggingPiece && originSquare) {
+            originSquare.appendChild(draggingPiece);
+        }
+        cleanupDrag();
+    });
+
+};
+
+//Prevents bugs, removes dragged piece, reset variables
+function cleanupDrag() {
+    clearHighlights();
+    if (ghostPiece) {
+        ghostPiece.remove();
+        ghostPiece = null;
+    }
+    draggingPiece = null;
+    originSquare = null;
+}
+
+//Ghost piece follows cursor when cursor moves
+document.addEventListener("mousemove", (e) => {
+    if (ghostPiece) {
+        moveGhostPiece(e);
+    }
+});
+function moveGhostPiece(e) {
+    ghostPiece.style.left = e.pageX - ghostPiece.offsetWidth / 2 + "px";
+    ghostPiece.style.top = e.pageY - ghostPiece.offsetHeight / 2 + "px";
+}
+
+
+//Trying to prevent the user from selecting elements when dragging
+document.addEventListener('dragstart', (e) => {
+    e.preventDefault();
+});
+
+
+
 //For now I simply reload the page
     // function resetBoard() {
     //     
@@ -422,4 +511,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //     clearInterval(interval);
     //     startClock();
     // }
+
+
+
 });
