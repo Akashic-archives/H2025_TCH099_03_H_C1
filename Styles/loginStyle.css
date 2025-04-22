@@ -1,0 +1,124 @@
+body{
+    margin: 0;
+    background-image: url("/Assets/Chessboard.png");
+    display: grid;
+    grid-template-rows: 15% 90% 25%;
+}
+
+
+main {
+    padding-top: 5%;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    color: #b6eed1;
+    
+}
+
+header {
+    top: 0;
+    background-color: #1e3027;
+    position: sticky;
+}
+
+#logo {
+    display: flex;
+    height: 80px;
+    margin-left: 2%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+#courriel, #motDePasse{
+    font-size: 20px;
+    text-align: left;
+}
+
+#courrielBar, #motDePasseBar{
+    width: 200px;
+    height: 25px;
+    display: flex;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    padding-left: 10px;
+}
+
+#titreConnection {
+    font-size: 55px;
+    text-align: center;
+    margin: 0;
+}
+
+#bSeConnecter{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 300px;
+    height: 50px;
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    border-radius: 15px;
+    border: 5px solid #add1be;
+    box-shadow: 5px 5px 10px #16241c;
+    background-color: #79b596;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    transition: 0.3s;
+}
+
+#bSeConnecter:hover {
+    width: 350px;
+    height: 60px;
+    transition: 0.3s;
+    font-size: 25px;
+    background-color: #49a576;
+    border: 5px solid #9ccfb4;
+}
+
+#loginToSignup {
+    text-align: center;
+}
+
+#toSignup {
+    color: #ffffff;
+    transition: 0.3s;
+}
+
+#toSignup:hover {
+    color: #2eb36e;
+    transition: 0.3s;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+#guest{
+    text-align: center;
+}
+
+#toGuest {
+    color: #ffffff;
+    transition: 0.3s;
+}
+
+#toGuest:hover {
+    color: #2eb36e;
+    transition: 0.3s;
+}
+
+footer{
+    bottom: 0;
+    background-color: #1e3027;
+}
+
+
+
+
+
+
+
+
