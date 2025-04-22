@@ -371,6 +371,15 @@ document.addEventListener("DOMContentLoaded", () => {
             let clickedSquare = event.currentTarget;
             
             if (clickedSquare.hasChildNodes()) {
+                
+                // Deselect if clicked again
+                if (clickedSquare === selectedSquare) {
+                    clearHighlights();
+                    selectedPiece = null;
+                    selectedSquare = null;
+                    return;
+                }
+                
                 if(clickedSquare.firstElementChild.classList.contains("BlackPieces")&&currentPlayer==1){
                     showLegalMoves(clickedSquare);
                 }
