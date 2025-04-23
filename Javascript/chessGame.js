@@ -519,7 +519,7 @@ document.addEventListener('dragstart', (e) => {
 
 //CODE FOR LOGIN AND SIGNUP - Pablo
 
-
+let user;
 
 function fetchNewUser(){
     let newUser = {
