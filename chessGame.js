@@ -1,18 +1,15 @@
 // Comments are mostly written in english
 // 
 // To do list:
+
 //  hidden Pieces
-//  DONE moving Pieces
-//  Taking Pieces
 //  Api
 //  Going through game with arrow keys
-//  Arrows with right click
-
 //  No enpassant yet
-//  No checks yet
 //  No castling yet
-// DONE Coloring squares
 
+//Limitations
+//Auto Queen promotions
 
 //This game currently functions with highlighted Squares
 //I check if the move is valid through piece selections and if the ending square is highlighted
@@ -337,7 +334,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             targetSquare.removeChild(targetPiece); // Remove opponent's piece
-            console.log("removed");
 
             if(targetPiece.alt=="whiteKing"){
                 setTimeout(function(){
@@ -356,11 +352,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 2000);
             }
         }
-
-
+    
         let pieceType = selectedPiece.alt;
         let piecePosition = selectedSquare.id;
+
+        //Pawn auto promotion to queen
+        let isWhite = selectedPiece.classList.contains("WhitePieces");
+        let isPawn = pieceType.includes("Pawn");
+        let targetRank = parseInt(targetSquare.id[1]);
     
+        if (isPawn && ((isWhite && targetRank === 8) || (!isWhite && targetRank === 1))) {
+            // Promote to queen
+            let newQueen = document.createElement("img");
+            let color = isWhite ? "white" : "black";
+            newQueen.src = `Assets/${isWhite ? "WhitePieces" : "BlackPieces"}/${color}Queen.png`;
+            newQueen.alt = `${color}Queen`;
+            newQueen.classList.add("chess-piece", isWhite ? "WhitePieces" : "BlackPieces");
+
+            selectedPiece = newQueen;
+        }
+
+
         if (pieceType.includes("Pawn") && !movedPawns.has(piecePosition)) {
             movedPawns.add(targetSquare.id); 
         }
@@ -370,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearHighlights();
         selectedPiece = null;
         selectedSquare = null;
-        
+
         //Start the clock of the game when white does first move
         if(whiteStart==true){
             startClock();
@@ -446,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(draggingPiece){
             
         if (square.classList.contains("highlight")) {
-            console.log("yes");
+            
             movePiece(square);
 
         //if dragging a piece and an originSquare exists readd the piece to board
