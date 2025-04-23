@@ -529,7 +529,6 @@ function DOMEventHandler() {
     }
 }
 
-
 function fetchNewUser(){
     let newUser = {
         Name : document.getElementById("prenomBar").value,
@@ -561,7 +560,7 @@ function fetchNewUser(){
             return response.json();
         })
         .then(data => {
-            sessionStorage.setItem("user", JSON.stringify(data));
+            sessionStorage.setItem("user", JSON.stringify(data[0]));
             window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
         })
         .catch(error => {
@@ -572,9 +571,54 @@ function fetchNewUser(){
     
 }
 
-let buttonInscrire = document.getElementById("bInscrire");
-buttonInscrire.addEventListener("click",  function(){
+function fetchConnection(){
+    if(document.getElementById("courrielBar") == '' || document.getElementById("motDePasseBar").value == '' ){
+        document.getElementById("error").innerHTML = "Il manque de l'information!";
+    }
+    else{
+
+        let email = document.getElementById('courrielBar').value;
+        let password = document.getElementById('motDePasseBar').value;
+
+        fetch('http://localhost:80/api/user/' + email, {methode: "GET"})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération du compte');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if(data[0].Password == password){
+                sessionStorage.setItem("user", JSON.stringify(data[0]));
+                window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
+            }   
+            else {
+                document.getElementById("error").innerHTML = "Mot de passe incorrecte!";
+            }         
+            
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });   
+    }
+}
+
+
+if(window.location.href.includes("signup.html")){
+    let buttonInscrire = document.getElementById("bInscrire");
+    buttonInscrire.addEventListener("click",  function(){
     if(document.readyState === "complete"){
         fetchNewUser();
     }
 });
+}
+
+if(window.location.href.includes("login.html")){
+    let buttonConnection = document.getElementById("bSeConnecter");
+    buttonConnection.addEventListener("click",  function(){
+    if(document.readyState === "complete"){
+        fetchConnection();
+    }
+});
+}
+
