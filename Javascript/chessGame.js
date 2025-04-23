@@ -525,7 +525,6 @@ document.addEventListener("DOMContentLoaded", DOMEventHandler());
 function DOMEventHandler() {
     if(window.location.href.includes("profile.html")) {
         const sessionUser = JSON.parse(sessionStorage.getItem("user"));
-        console.log(sessionUser);
     }
 }
 
