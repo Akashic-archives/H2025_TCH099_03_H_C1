@@ -519,7 +519,16 @@ document.addEventListener('dragstart', (e) => {
 
 //CODE FOR LOGIN AND SIGNUP - Pablo
 
-let user;
+
+document.addEventListener("DOMContentLoaded", DOMEventHandler());
+
+function DOMEventHandler() {
+    if(window.location.href.includes("profile.html")) {
+        const sessionUser = JSON.parse(sessionStorage.getItem("user"));
+        console.log(sessionUser);
+    }
+}
+
 
 function fetchNewUser(){
     let newUser = {
@@ -549,8 +558,11 @@ function fetchNewUser(){
             if (!response.ok) {
                 throw new Error('Erreur lors de la création du compte');
             }
-            window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
             return response.json();
+        })
+        .then(data => {
+            sessionStorage.setItem("user", JSON.stringify(data));
+            window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
         })
         .catch(error => {
             console.error('Erreur:', error);
