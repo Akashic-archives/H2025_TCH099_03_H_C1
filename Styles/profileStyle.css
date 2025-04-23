@@ -1,0 +1,43 @@
+body{
+    margin: 0;
+    background-image: url("/Assets/Chessboard.png");
+    display: grid;
+    grid-template-rows: 5rem auto 7rem;
+}
+
+
+main {
+    padding: 5%;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    color: #b6eed1;
+}
+
+header {
+    top: 0;
+    background-color: #1e3027;
+    height: 5rem;
+    position: sticky;
+}
+
+#logo {
+    display: flex;
+    height: 80px;
+    margin-left: 2%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+footer{
+    bottom: 0;
+    background-color: #1e3027;
+}
+
+#copyright {
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #9ccfb4;
+}
