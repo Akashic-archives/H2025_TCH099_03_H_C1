@@ -29,9 +29,12 @@ const piecePlacementBlack = [...piecePlacementWhite].map(row => [...row]).revers
 const piecePlacement = piecePlacementWhite;
 let playerColor;
 let gameHistory = [];
+let blackStart = true;
 
 document.addEventListener("DOMContentLoaded", () => {
-    
+    let whiteStart=true;
+    let selectedPiece = null;
+    let selectedSquare = null;
     let socket;
     let isMyTurn = false;
 
@@ -56,6 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (data.type === "move") {
+                if(playerColor=="white"&&blackStart){
+                    startClock();
+                    blackStart=false;
+                }
+
                 console.log(data);
                 applyOpponentMove(data);
                 isMyTurn = true;
@@ -89,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function createBoard(playerColor) {
         const board = document.getElementById("board");
 
-    
         const piecePlacement = playerColor === "white" ? piecePlacementWhite : piecePlacementBlack;
 
 
@@ -112,7 +119,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (piece) {
                     const img = document.createElement("img");
                     const pieceColor = piece.startsWith("white") ? "WhitePieces" : "BlackPieces";
-                    img.src = `Assets/${pieceColor}/${piece}.png`;
+                    if(playerColor=="black"){
+                        if(pieceColor=="BlackPieces"){
+                            img.src = `Assets/${pieceColor}/${piece}.png`;
+                        }else{
+                            img.src = `Assets/${pieceColor}/whiteUnknown.png`;
+                        }
+                    }else if(playerColor=="white"){
+                        if(pieceColor=="WhitePieces"){
+                            img.src = `Assets/${pieceColor}/${piece}.png`;
+                        }else{
+                            img.src = `Assets/${pieceColor}/blackUnknown.png`;
+                        }
+                    }
                     img.alt = piece;
                     img.classList.add("chess-piece", pieceColor);
                     square.appendChild(img);
@@ -125,6 +144,15 @@ document.addEventListener("DOMContentLoaded", () => {
         boardCreated()
     }
     let movedPawns = new Set();
+
+    let button = document.getElementById("bluff");
+    button.addEventListener("click",()=>{
+        socket.send(JSON.stringify({ type: "bluff"}));
+        
+        isMyTurn = false;
+        switchPlayer();
+    });
+
 
     function getLegalPawnMoves(position, color) {
         let moves = [];
@@ -319,31 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function switchPlayer() {
         currentPlayer = currentPlayer === 1 ? 2 : 1;
     }
-
-    // Initialize Board
     
-
-    // for (let row = 0; row < 8; row++) {
-    //     for (let col = 0; col < 8; col++) {
-    //         const square = document.createElement("div");
-    //         square.classList.add("square", (row + col) % 2 === 0 ? "light" : "dark");
-            
-    //         if (piecePlacement[row].length > 0) {
-    //             const piece = piecePlacement[row][col];
-    //             if (piece) {
-    //                 const img = document.createElement("img");
-    //                 const pieceColor = piece.startsWith("white") ? "WhitePieces" : "BlackPieces";
-    //                 img.src = `Assets/${pieceColor}/${piece}.png`;
-    //                 img.alt = piece;
-    //                 img.classList.add("chess-piece");
-    //                 img.classList.add(pieceColor);
-    //                 square.appendChild(img);
-    //             }
-    //         }
-            
-    //         board.appendChild(square);
-    //     }
-    // }
 
     const boardSquares = document.getElementsByClassName("square");
     
@@ -364,9 +368,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function boardCreated(){
     updateClockDisplay();
 
-    let whiteStart=true;
-    let selectedPiece = null;
-    let selectedSquare = null;
 
     function showLegalMoves(square) {
         const piece = square.firstElementChild;
@@ -488,10 +489,11 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSquare = null;
 
         //Start the clock of the game when white does first move
-        if(whiteStart==true){
+        if(whiteStart&&playerColor=="black"){
             startClock();
             whiteStart=false;
         }
+    
 
 
         if (socket && socket.readyState === WebSocket.OPEN) {
@@ -600,9 +602,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         //if dragging a piece and an originSquare exists readd the piece to board
         } else{
+            
             originSquare.appendChild(draggingPiece);
             cleanupDrag();
-            
+
     //old click code
             let clickedSquare = square
             
