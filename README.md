@@ -1,9 +1,9 @@
 # TCH099-web
 
-Voici, pour notre projet intégrateur, un jeu d'échecs qui combine le jeux liar's chess.
+Voici, pour notre projet intégrateur, un jeu d'échecs qui combine le jeu liar's chess.
 On doit mentir pour gagner. On peut bluff le mouvement qu'on fait.
 
-### Installer le fontend
+### Installer le frontend
 Après avoir cloné cette repo sur un serveur debian,
 ```shell
 sudo apt-get update && sudo apt-get install nginx
