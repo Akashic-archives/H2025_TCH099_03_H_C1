@@ -46,6 +46,7 @@ body {
     align-items: center;
     font-size: 24px;
     font-weight: bold;
+    user-select: none;
 }
 .light {
     background-color: #eee;
@@ -70,6 +71,13 @@ body {
     border: none;
     cursor: pointer;
 }
-.highlight{
-    background-color: rgb(30, 255, 0);
+
+.highlight {
+    position: relative;
+    box-shadow: 0 0 0 3px yellow inset;
+}
+
+
+body {
+    user-select: none;
 }

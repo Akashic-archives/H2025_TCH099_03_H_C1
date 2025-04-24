@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Styles/signupStyle.css">
+    <title>Liar's Chess</title>
+    <script type="module" src="/Javascript/chessGame.js"></script>
+</head>
+<body>
+    <header>
+        <img src="/Assets/Liar's Chess - White logo.png" alt="Liar's Chess logo" id="logo">
+    </header>
+
+    <main>
+        
+
+        <h1 id="titreInscription">Inscription</h1>
+
+        <div class="center">
+           <p id="prenom">Prénom : <input type="text" id="prenomBar" ></p> 
+        </div>
+        
+        <div class="center">
+            <p id="nom">Nom : <input type="text" id="nomBar"></p>
+        </div>
+
+        <div class="center">
+            <p id="username">Nom d'utilisateur : <input type="text" id="usernameBar"></p>
+        </div>
+        
+        
+        <div class="center">
+            <p id="courriel">Courriel : <input type="email" id="courrielBar" placeholder="example@email.com"></p>
+        </div>
+
+        <div class="center">
+            <p id="motDePasse">Mot de passe : <input type="password" id="motDePasseBar"></p>
+        </div>
+
+        <div class="center">
+            <p id="confirmation">Confirmez votre mot de passe : <input type="password" id="confirmationBar"></p>
+        </div>
+
+        <p id="error"></p>
+        <button id="bInscrire">S'inscrire</button>
+         
+        <p id="signupToLogin">Déjà inscrit? Connectez-vous <a href="login.html" id="toLogin">ici</a> !</p>
+    </main>
+
+    <footer>
+        <p id="copyright">Liar's Chess &copy2025</p>
+    </footer>
+
+</body>
+</html>
