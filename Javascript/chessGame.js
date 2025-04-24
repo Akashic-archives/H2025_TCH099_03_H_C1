@@ -670,3 +670,209 @@ document.addEventListener('dragstart', (e) => {
 });
     }
 });
+
+
+
+
+
+//CODE FOR LOGIN AND SIGNUP - Pablo
+
+
+document.addEventListener("DOMContentLoaded", DOMEventHandler());
+
+function DOMEventHandler() {
+    if(window.location.href.includes("profile.html")) {
+        const sessionUser = JSON.parse(sessionStorage.getItem("user"));
+        populateProfile(sessionUser);
+    }
+}
+
+function fetchNewUser(){
+    const pattern = /^(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
+    let okPassword = pattern.test(document.getElementById("motDePasseBar").value);
+
+    if(document.getElementById("motDePasseBar").value != document.getElementById("confirmationBar").value){
+        document.getElementById("error").innerHTML = "Les mots de passes ne sont pas les même!";
+    }
+    else if(document.getElementById("prenomBar").value == '' || document.getElementById("nomBar").value == '' || 
+    document.getElementById("usernameBar").value == '' || document.getElementById("courrielBar") == '' || document.getElementById("motDePasseBar").value == '' ){
+        document.getElementById("error").innerHTML = "Il manque de l'information!";
+    }
+    else if(!okPassword){
+        document.getElementById("error").innerHTML = "Le mot de passe doit contenir un chiffre, une majuscule et un caractère spéciale!";
+    }
+    else{
+        let newUser = {
+        Name : document.getElementById("prenomBar").value,
+        LastName: document.getElementById("nomBar").value,
+        UserName: document.getElementById("usernameBar").value,
+        Email: document.getElementById("courrielBar").value,
+        Password: document.getElementById("motDePasseBar").value
+    };
+
+        fetch('http://localhost:80/api/web/user', 
+        {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newUser)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors de la création du compte');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if(data["error"] == "Exists"){
+                document.getElementById("error").innerHTML = "Ce courriel à déjà un compte!";
+            }
+            else {
+                sessionStorage.setItem("user", JSON.stringify(data[0]));
+                window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
+            }
+        })
+        .catch(error => {
+            if(data == "Exists"){
+                document.getElementById("error").innerHTML = "Ce courriel à déjà un compte!";
+            }
+            console.error('Erreur:', error);
+        });
+        
+    }
+    
+}
+
+function fetchConnection(){
+    if(document.getElementById("courrielBar") == '' || document.getElementById("motDePasseBar").value == '' ){
+        document.getElementById("error").innerHTML = "Il manque de l'information!";
+    }
+    else{
+
+        let email = document.getElementById('courrielBar').value;
+        let password = document.getElementById('motDePasseBar').value;
+
+        fetch('http://localhost:80/api/user/' + email, {methode: "GET"})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération du compte');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if(data.length == 0){
+                document.getElementById("error").innerHTML = "Courriel pas trouvé!";
+            }
+            else if(data[0].Password == password){
+                sessionStorage.setItem("user", JSON.stringify(data[0]));
+                window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
+            }   
+            else {
+                document.getElementById("error").innerHTML = "Mot de passe incorrecte!";
+            }         
+            
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });   
+    }
+}
+function populateHistorique(sessionUser){
+    let id = sessionUser['UserID'];
+    
+
+
+    fetch('http://localhost:80/api/user/games/' + id, {methode: "GET"})
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur lors de la récupération du compte');
+        }
+        return response.json();
+    })
+    .then(data => {
+        let games = data;
+        for (let i = 0; i < games.length; i++) {
+
+            fetch('http://localhost:80/api/user/id/' + games[i]["Player_black"], {methode: "GET"})
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération du compte');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let player1Username = data;
+                fetch('http://localhost:80/api/user/id/' + games[i]["Player_white"], {methode: "GET"})
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur lors de la récupération du compte');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    let player2Username = data;
+                    let newGameData = document.createElement('p');
+                    newGameData.innerHTML = player1Username[0]["UserName"] + " VS. " + player2Username[0]["UserName"] ;
+                    newGameData.className = "battle";
+
+                    let container = document.getElementById('historique'); 
+                    container.appendChild(newGameData);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                }); 
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            }); 
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });  
+
+
+    
+}
+
+function populateProfile(sessionUser){
+    let usernameTag = document.getElementById("username");
+    usernameTag.innerHTML = sessionUser['UserName'];  
+
+    let nameTag = document.getElementById("name");
+    nameTag.innerHTML = sessionUser['Name'] + " " + sessionUser['LastName'];
+
+    populateHistorique(sessionUser);
+}
+
+if(window.location.href.includes("signup.html")){
+    let buttonInscrire = document.getElementById("bInscrire");
+    buttonInscrire.addEventListener("click",  function(){
+    if(document.readyState === "complete"){
+        fetchNewUser();
+    }
+});
+}
+
+if(window.location.href.includes("login.html")){
+    let buttonConnection = document.getElementById("bSeConnecter");
+    buttonConnection.addEventListener("click",  function(){
+    if(document.readyState === "complete"){
+        fetchConnection();
+    }
+});
+}
+
+if(window.location.href.includes("profile.html")){
+    let buttonJouer = document.getElementById("bJouer");
+    buttonJouer.addEventListener("click",  function(){
+    if(document.readyState === "complete"){
+        window.location.href = "http://127.0.0.1:5500/HTML/gameboard.html";
+    }});
+
+    let buttonDeconnection = document.getElementById("bDeconnecter");
+    buttonDeconnection.addEventListener("click",  function(){
+    if(document.readyState === "complete"){
+        sessionStorage.clear();
+        window.location.href = "http://127.0.0.1:5500/HTML/login.html";
+    }});
+}

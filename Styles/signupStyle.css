@@ -28,14 +28,18 @@ header {
     align-items: center;
 }
 
-
-
-#prenom, #nom, #courriel, #motDePasse, #confirmation{
-    font-size: 15px;
-    text-align: left;
+fieldset{
+    border: none;
 }
 
-#prenomBar, #nomBar, #courrielBar, #motDePasseBar, #confirmationBar{
+
+#prenom, #nom, #username, #courriel, #motDePasse, #confirmation{
+    font-size: 15px;
+    text-align: left;
+    margin: 0.5%;
+}
+
+#prenomBar, #nomBar, #usernameBar,#courrielBar, #motDePasseBar, #confirmationBar{
     width: 200px;
     height: 35px;
     display: flex;
@@ -124,4 +128,19 @@ footer{
     font-size: 15px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     color: #9ccfb4;
+}
+
+#error{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 20px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #ffb3b3;
+    
 }
