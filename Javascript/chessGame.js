@@ -685,7 +685,7 @@ function DOMEventHandler() {
 }
 
 function fetchNewUser(){
-    const pattern = /^(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).+$/;
+    const pattern = /^(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
     let okPassword = pattern.test(document.getElementById("motDePasseBar").value);
 
     if(document.getElementById("motDePasseBar").value != document.getElementById("confirmationBar").value){
