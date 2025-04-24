@@ -533,13 +533,8 @@ function DOMEventHandler() {
 }
 
 function fetchNewUser(){
-    let newUser = {
-        Name : document.getElementById("prenomBar").value,
-        LastName: document.getElementById("nomBar").value,
-        UserName: document.getElementById("usernameBar").value,
-        Email: document.getElementById("courrielBar").value,
-        Password: document.getElementById("motDePasseBar").value
-    };
+    const pattern = /^(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).+$/;
+    let okPassword = pattern.test(document.getElementById("motDePasseBar").value);
 
     if(document.getElementById("motDePasseBar").value != document.getElementById("confirmationBar").value){
         document.getElementById("error").innerHTML = "Les mots de passes ne sont pas les même!";
@@ -548,7 +543,17 @@ function fetchNewUser(){
     document.getElementById("usernameBar").value == '' || document.getElementById("courrielBar") == '' || document.getElementById("motDePasseBar").value == '' ){
         document.getElementById("error").innerHTML = "Il manque de l'information!";
     }
+    else if(!okPassword){
+        document.getElementById("error").innerHTML = "Le mot de passe doit contenir un chiffre, une majuscule et un caractère spéciale!";
+    }
     else{
+        let newUser = {
+        Name : document.getElementById("prenomBar").value,
+        LastName: document.getElementById("nomBar").value,
+        UserName: document.getElementById("usernameBar").value,
+        Email: document.getElementById("courrielBar").value,
+        Password: document.getElementById("motDePasseBar").value
+    };
 
         fetch('http://localhost:80/api/web/user', 
         {
