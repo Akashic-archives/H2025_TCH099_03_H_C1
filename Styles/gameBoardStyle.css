@@ -76,10 +76,7 @@ body {
     position: relative;
     box-shadow: 0 0 0 3px yellow inset;
 }
-.square.highlight.hovered {
-    position: relative;
-    box-shadow: 0 0 0 3px rgb(255, 166, 0) inset;
-}
+
 
 body {
     user-select: none;
