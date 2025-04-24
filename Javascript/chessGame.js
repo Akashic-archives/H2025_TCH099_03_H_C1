@@ -563,10 +563,18 @@ function fetchNewUser(){
             return response.json();
         })
         .then(data => {
-            sessionStorage.setItem("user", JSON.stringify(data[0]));
-            window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
+            if(data["error"] == "Exists"){
+                document.getElementById("error").innerHTML = "Ce courriel à déjà un compte!";
+            }
+            else {
+                sessionStorage.setItem("user", JSON.stringify(data[0]));
+                window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
+            }
         })
         .catch(error => {
+            if(data == "Exists"){
+                document.getElementById("error").innerHTML = "Ce courriel à déjà un compte!";
+            }
             console.error('Erreur:', error);
         });
         
