@@ -28,8 +28,11 @@ const piecePlacementWhite = [
 const piecePlacementBlack = [...piecePlacementWhite].map(row => [...row]).reverse();
 const piecePlacement = piecePlacementWhite;
 let playerColor;
-let gameHistory = [];
+let moveHistory = [];
 let blackStart = true;
+
+let isLastMoveValid=false;
+let lastMovePiece;
 
 document.addEventListener("DOMContentLoaded", () => {
     let whiteStart=true;
@@ -57,7 +60,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("Game started, you are", data.color);
                 createBoard(data.color);
             }
-
+            if(data.type=="gameover"){
+                console.log(data);
+                if(!playerColor==data.winner){
+                    alert("You win!");
+                    setTimeout(function(){
+                        location.reload();
+                    }, 2000);
+                }else{
+                    alert("You lose :(");
+                    setTimeout(function(){
+                        location.reload();
+                    }, 2000);
+                }
+            }
             if (data.type === "move") {
                 if(playerColor=="white"&&blackStart){
                     startClock();
@@ -68,6 +84,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 applyOpponentMove(data);
                 isMyTurn = true;
             }
+            if(data.type === "bluff"){
+                console.log(data);
+                    let tp = "bluffanswer";
+                    let ans = isLastMoveValid;
+                    let rev = null;
+                    let tk = null;
+                    if(ans){
+                        rev=true;
+                    }else{
+                        if (moveHistory.length === 0) return;
+
+                        const lastMove = moveHistory.pop();
+                        tk=lastMove.capturedPieceHTML;
+                        undoLastMove(lastMove);
+                    }
+
+                    socket.send(JSON.stringify({ type: tp, answer: ans, reveal:rev, takenPiece:tk}));
+            }
+            if(data.type == "bluffanswer"){
+                console.log(data);
+                if(data.answer){
+                    
+                }else{
+                    if (moveHistory.length === 0) return;
+                    const lastMove = moveHistory.pop();
+                    undoLastMove(lastMove);
+                }
+            }
         });
 
         socket.addEventListener("close", () => {
@@ -75,20 +119,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     }
+
     setupWebSocket();
 
     function applyOpponentMove(move) {
-        console.log(move);
         const fromSquare = document.getElementById(move.from);
         const toSquare = document.getElementById(move.to);
         const piece = fromSquare.firstElementChild;
     
         if (!piece) return;
-    
+        let targetPiece=null;
         if (toSquare.hasChildNodes()) {
+            console.log(toSquare);
+            targetPiece=toSquare;
             toSquare.removeChild(toSquare.firstElementChild);
         }
+
     
+        moveHistory.push({
+            fromId: move.from,
+            toId: move.to,
+            movingPieceHTML: piece.outerHTML,
+            capturedPieceHTML: targetPiece ? targetPiece.outerHTML : null
+        });
         toSquare.appendChild(piece);
         clearHighlights();
         switchPlayer();
@@ -147,12 +200,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let button = document.getElementById("bluff");
     button.addEventListener("click",()=>{
-        socket.send(JSON.stringify({ type: "bluff"}));
-        
-        isMyTurn = false;
-        switchPlayer();
+        if(isMyTurn){
+            socket.send(JSON.stringify({ type: "bluff"}));
+        }
     });
 
+    function undoLastMove(lastMove) {
+        
+        const from = document.getElementById(lastMove.fromId);
+        const to = document.getElementById(lastMove.toId);
+        const movedPiece = to.firstElementChild;
+    
+        // Remove moved piece from 'to' square
+        if (movedPiece) to.removeChild(movedPiece);
+    
+        // Restore piece to 'from' square
+        from.innerHTML = lastMove.movingPieceHTML;
+    
+        // If there was a captured piece, restore it
+        if (lastMove.capturedPieceHTML) {
+            to.innerHTML = lastMove.capturedPieceHTML;
+        }
+    }
 
     function getLegalPawnMoves(position, color) {
         let moves = [];
@@ -386,7 +455,13 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSquare = square;
 
         let legalMoves = [];
-    
+        // let legalMoves = [
+        //     ...getLegalPawnMoves(piecePosition, pieceColor),
+        //     ...getLegalKnightMoves(piecePosition, pieceColor),
+        //     ...getLegalSlidingMoves(piecePosition, [[1, 1], [1, -1], [-1, 1], [-1, -1]], pieceColor), // bishop
+        //     ...getLegalSlidingMoves(piecePosition, [[1, 0], [-1, 0], [0, 1], [0, -1]], pieceColor),   // rook
+        //     ...getLegalKingMoves(piecePosition, pieceColor),
+        // ];
         switch (pieceType) {
             case "whitePawn":
             case "blackPawn":
@@ -426,10 +501,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!selectedPiece || !selectedSquare){ 
             return;
         }
-
+        let targetPiece = null;
         if (targetSquare.hasChildNodes()) {
 
-            let targetPiece = targetSquare.firstElementChild;
+            targetPiece = targetSquare.firstElementChild;
             let targetPieceColor = targetPiece.classList.contains("WhitePieces") ? "white" : "black";
             let currentPieceColor = selectedPiece.classList.contains("WhitePieces") ? "white" : "black";
                 
@@ -441,16 +516,26 @@ document.addEventListener("DOMContentLoaded", () => {
             targetSquare.removeChild(targetPiece); // Remove opponent's piece
 
             if(targetPiece.alt=="whiteKing"){
+                socket.send(JSON.stringify({type:"gameover", winner:"black"}));
                 setTimeout(function(){
-                    alert("Player 2 wins!");
+                    if(playerColor=="black"){
+                        alert("You win!");
+                    }else{
+                        alert("You lose :(")
+                    }
                 }, 1000);
                 setTimeout(function(){
                     location.reload();
                 }, 2000);
             }
             if(targetPiece.alt=="blackKing"){
+                socket.send(JSON.stringify({type:"gameover", winner:"white"}));
                 setTimeout(function(){
-                    alert("Player 1 wins!");
+                    if(playerColor=="white"){
+                        alert("You win!");
+                    }else{
+                        alert("You lose :(")
+                    }
                 }, 1000);
                 setTimeout(function(){
                     location.reload();
@@ -481,6 +566,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (pieceType.includes("Pawn") && !movedPawns.has(piecePosition)) {
             movedPawns.add(targetSquare.id); 
         }
+
+        moveHistory.push({
+            fromId: piecePosition,
+            toId: targetSquare.id,
+            movingPieceHTML: selectedPiece.outerHTML,
+            capturedPieceHTML: targetPiece ? targetPiece.outerHTML : null
+        });
 
         targetSquare.appendChild(selectedPiece);
     
@@ -670,169 +762,6 @@ document.addEventListener('dragstart', (e) => {
 });
     }
 });
-
-
-
-
-
-//CODE FOR LOGIN AND SIGNUP - Pablo
-
-
-document.addEventListener("DOMContentLoaded", DOMEventHandler());
-
-function DOMEventHandler() {
-    if(window.location.href.includes("profile.html")) {
-        const sessionUser = JSON.parse(sessionStorage.getItem("user"));
-        populateProfile(sessionUser);
-    }
-}
-
-function fetchNewUser(){
-    const pattern = /^(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
-    let okPassword = pattern.test(document.getElementById("motDePasseBar").value);
-
-    if(document.getElementById("motDePasseBar").value != document.getElementById("confirmationBar").value){
-        document.getElementById("error").innerHTML = "Les mots de passes ne sont pas les même!";
-    }
-    else if(document.getElementById("prenomBar").value == '' || document.getElementById("nomBar").value == '' || 
-    document.getElementById("usernameBar").value == '' || document.getElementById("courrielBar") == '' || document.getElementById("motDePasseBar").value == '' ){
-        document.getElementById("error").innerHTML = "Il manque de l'information!";
-    }
-    else if(!okPassword){
-        document.getElementById("error").innerHTML = "Le mot de passe doit contenir un chiffre, une majuscule et un caractère spéciale!";
-    }
-    else{
-        let newUser = {
-        Name : document.getElementById("prenomBar").value,
-        LastName: document.getElementById("nomBar").value,
-        UserName: document.getElementById("usernameBar").value,
-        Email: document.getElementById("courrielBar").value,
-        Password: document.getElementById("motDePasseBar").value
-    };
-
-        fetch('http://localhost:80/api/web/user', 
-        {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(newUser)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur lors de la création du compte');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if(data["error"] == "Exists"){
-                document.getElementById("error").innerHTML = "Ce courriel à déjà un compte!";
-            }
-            else {
-                sessionStorage.setItem("user", JSON.stringify(data[0]));
-                window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
-            }
-        })
-        .catch(error => {
-            if(data == "Exists"){
-                document.getElementById("error").innerHTML = "Ce courriel à déjà un compte!";
-            }
-            console.error('Erreur:', error);
-        });
-        
-    }
-    
-}
-
-function fetchConnection(){
-    if(document.getElementById("courrielBar") == '' || document.getElementById("motDePasseBar").value == '' ){
-        document.getElementById("error").innerHTML = "Il manque de l'information!";
-    }
-    else{
-
-        let email = document.getElementById('courrielBar').value;
-        let password = document.getElementById('motDePasseBar').value;
-
-        fetch('http://localhost:80/api/user/' + email, {methode: "GET"})
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur lors de la récupération du compte');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if(data.length == 0){
-                document.getElementById("error").innerHTML = "Courriel pas trouvé!";
-            }
-            else if(data[0].Password == password){
-                sessionStorage.setItem("user", JSON.stringify(data[0]));
-                window.location.href = "http://127.0.0.1:5500/HTML/profile.html";
-            }   
-            else {
-                document.getElementById("error").innerHTML = "Mot de passe incorrecte!";
-            }         
-            
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-        });   
-    }
-}
-function populateHistorique(sessionUser){
-    let id = sessionUser['UserID'];
-    
-
-
-    fetch('http://localhost:80/api/user/games/' + id, {methode: "GET"})
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur lors de la récupération du compte');
-        }
-        return response.json();
-    })
-    .then(data => {
-        let games = data;
-        for (let i = 0; i < games.length; i++) {
-
-            fetch('http://localhost:80/api/user/id/' + games[i]["Player_black"], {methode: "GET"})
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur lors de la récupération du compte');
-                }
-                return response.json();
-            })
-            .then(data => {
-                let player1Username = data;
-                fetch('http://localhost:80/api/user/id/' + games[i]["Player_white"], {methode: "GET"})
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erreur lors de la récupération du compte');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    let player2Username = data;
-                    let newGameData = document.createElement('p');
-                    newGameData.innerHTML = player1Username[0]["UserName"] + " VS. " + player2Username[0]["UserName"] ;
-                    newGameData.className = "battle";
-
-                    let container = document.getElementById('historique'); 
-                    container.appendChild(newGameData);
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                }); 
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-            }); 
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-    });  
-
-
-    
-}
 
 function populateProfile(sessionUser){
     let usernameTag = document.getElementById("username");
